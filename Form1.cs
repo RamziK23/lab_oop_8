@@ -16,14 +16,25 @@ namespace lab_oop_8
         public Form1()
         {
             InitializeComponent();
+            storag.AddObserver(tree);
         }
-
+        TreeViews tree = new TreeViews();
         int p = 0;
         static int k = 5;
         Storage storag = new Storage(k);
         static int index = 0; // Кол-во нарисованных фигур
         static int indexin = 0; // Индекс, в какое место была помещена фигура
         int figure_now = 1; // Какая фигура выбрана
+        public interface IObservable
+        {   // Наблюдаемый объект
+            void AddObserver(IObserver o);
+            void RemoveObserver(IObserver o);
+            void NotifyObservers();
+        }
+        public interface IObserver
+        {   // Наблюдатель
+            void Update(ref TreeView treeView, Storage stg);
+        }
 
         public class Figure
         {
@@ -44,6 +55,11 @@ namespace lab_oop_8
             public virtual bool checkfigure(int x, int y) { return false; }
             public virtual void setcolor(Color color) { }
             public virtual void caseswitch(ref StreamReader sr, ref Figure figure, CreateFigure createFigure) { }
+            public virtual void get_min_x(ref int f) { }
+            public virtual void get_max_x(ref int f) { }
+            public virtual void get_min_y(ref int f) { }
+            public virtual void get_max_y(ref int f) { }
+            public virtual string name() { return "null"; }
         }
 
         class Group : Figure
@@ -51,6 +67,7 @@ namespace lab_oop_8
             public int maxcount = 10;
             public Figure[] group;
             public int count;
+            int min_x = 99999, max_x = 0, min_y = 99999, max_y = 0;
             public Group()
             {   // Выделяем maxcount мест в хранилище
                 count = 0;
@@ -97,19 +114,81 @@ namespace lab_oop_8
                 }
             }
 
-            public override void move_x(int x, Panel paint_box)
+
+
+            public void getsize()
             {
+                min_x = 99999; max_x = 0; min_y = 99999; max_y = 0;
                 for (int i = 0; i < count; ++i)
                 {
-                    group[i].move_x(x, paint_box);
+                    int f = 0;
+                    group[i].get_min_x(ref f);
+                    if (f < min_x)
+                        min_x = f;
+                    group[i].get_max_x(ref f);
+                    if (f > max_x)
+                        max_x = f;
+                    group[i].get_min_y(ref f);
+                    if (f < min_y)
+                        min_y = f;
+                    group[i].get_max_y(ref f);
+                    if (f > max_y)
+                        max_y = f;
                 }
             }
 
+
+
+            public override void move_x(int x, Panel paint_box)
+            {
+                //for (int i = 0; i < count; ++i)
+                //{
+                //    group[i].move_x(x, paint_box);
+                //}
+                getsize();
+                if ((min_x + x) > 0 && (max_x + x) < paint_box.ClientSize.Width)
+                {
+                    for (int i = 0; i < count; ++i)
+                    {
+                        group[i].move_x(x, paint_box);
+                    }
+                }
+            }
+
+
+
+            public override void get_min_x(ref int f)
+            {
+                f = min_x;
+            }
+            public override void get_max_x(ref int f)
+            {
+                f = max_x;
+            }
+            public override void get_min_y(ref int f)
+            {
+                f = min_y;
+            }
+            public override void get_max_y(ref int f)
+            {
+                f = max_y;
+            }
+
+
+
             public override void move_y(int y, Panel paint_box)
             {
-                for (int i = 0; i < count; ++i)
+                //for (int i = 0; i < count; ++i)
+                //{
+                //    group[i].move_y(y, paint_box);
+                //}
+                getsize();
+                if ((min_y + y) > 0 && (max_y + y) < paint_box.ClientSize.Height)
                 {
-                    group[i].move_y(y, paint_box);
+                    for (int i = 0; i < count; ++i)
+                    {
+                        group[i].move_y(y, paint_box);
+                    }
                 }
             }
             public override void changesize(int size)
@@ -135,6 +214,12 @@ namespace lab_oop_8
                 {
                     group[i].setcolor(color);
                 }
+            }
+
+
+            public override string name()
+            {
+                return "Group";
             }
         }
         public class CreateFigure : Figure
@@ -188,6 +273,25 @@ namespace lab_oop_8
                 paint_box.CreateGraphics().FillEllipse(
                     figurefillcolor, x, y, rad * 2, rad * 2);
             }
+
+            public override void get_min_x(ref int f)
+            {
+                f = x;
+            }
+            public override void get_max_x(ref int f)
+            {
+                f = x + (rad * 2);
+            }
+            public override void get_min_y(ref int f)
+            {
+                f = y;
+            }
+            public override void get_max_y(ref int f)
+            {
+                f = y + (rad * 2);
+            }
+
+
             public override void move_x(int x, Panel paint_box)
             {
                 int c = this.x + x;
@@ -213,6 +317,11 @@ namespace lab_oop_8
             {
                 fillcolor = color;
             }
+
+            public override string name()
+            {
+                return "Circle";
+            }
             //~Circle() { }
         }
 
@@ -220,7 +329,7 @@ namespace lab_oop_8
         {
             //public int x, y;
             public int lenght = 60;
-            public int wight = 10;
+            public int wight = 5;
             public Line() { }
             public Line(int x, int y)
             {
@@ -246,6 +355,25 @@ namespace lab_oop_8
                 paint_box.CreateGraphics().FillRectangle(figurefillcolor, x,
                     y, lenght, wight);
             }
+
+
+            public override void get_min_x(ref int f)
+            {
+                f = x;
+            }
+            public override void get_max_x(ref int f)
+            {
+                f = x + lenght;
+            }
+            public override void get_min_y(ref int f)
+            {
+                f = y;
+            }
+            public override void get_max_y(ref int f)
+            {
+                f = y + wight;
+            }
+
             public override void move_x(int x, Panel paint_box)
             {
                 int l = this.x + x;
@@ -261,7 +389,7 @@ namespace lab_oop_8
             public override void changesize(int size)
             {
                 lenght += size;
-                wight += size / 5;
+                //wight += size / 5;
             }
             public override bool checkfigure(int x, int y)
             {
@@ -271,6 +399,11 @@ namespace lab_oop_8
             public override void setcolor(Color color)
             {
                 fillcolor = color;
+            }
+
+            public override string name()
+            {
+                return "Line";
             }
         }
 
@@ -288,14 +421,22 @@ namespace lab_oop_8
             }
         }
 
-        public class Storage
+        public class Storage: IObservable
         {
             public Figure[] objects;
+            public TreeView treeView;
+            public List<IObserver> observers;
+            public Storage() { }
             public Storage(int count)
             {
                 objects = new Figure[count];
+                observers = new List<IObserver>();
                 for (int i = 0; i < count; ++i)
                     objects[i] = null;
+            }
+            public void intit_tree(ref TreeView treeView)
+            {
+                this.treeView = treeView;
             }
             public void initialisat(int count)
             {//выделяем место
@@ -311,12 +452,14 @@ namespace lab_oop_8
                 }
                 objects[ind] = object1;
                 indexin = ind;
+                NotifyObservers();
             }
             public void delete_object(int ind)
             {//удаляет объект из хранилища
                 objects[ind] = null;
                 if (index > 0)
                     index--;
+                NotifyObservers();
             }
             public bool check_empty(int index)
             {//занято ли место
@@ -347,9 +490,54 @@ namespace lab_oop_8
                 for (int i = 0; i < size; ++i)
                     objects[i] = storage1.objects[i];
             }
-            ~Storage() { }
+
+            public void AddObserver(IObserver o)
+            {
+                observers.Add(o);
+            }
+            public void RemoveObserver(IObserver o)
+            {
+                observers.Remove(o);
+            }
+            public void NotifyObservers()
+            {
+                foreach (IObserver observer in observers)
+                    observer.Update(ref treeView, this);
+            }
+
+            //~Storage() { }
         };
 
+        class TreeViews : IObserver
+        {
+            public TreeViews() { }
+            public void Update(ref TreeView treeView, Storage stg)
+            {
+                treeView.Nodes.Clear();
+                treeView.Nodes.Add("Figures");
+                for (int i = 0; i < k; ++i)
+                {
+                    if (!stg.check_empty(i))
+                    {
+                        //treeView.Nodes.Add(stg.objects[i].name());
+                        fillnode(treeView.Nodes[0], stg.objects[i]);
+                    }
+                }
+                treeView.ExpandAll();
+            }
+            public void fillnode(TreeNode treeNode, Figure figure)
+            {
+                TreeNode nodes = treeNode.Nodes.Add(figure.name());
+                if (figure.name() == "Group")
+                {
+                    for (int i = 0; i < (figure as Group).count; ++i)
+                    {
+                        fillnode(nodes, (figure as Group).group[i]);
+                    }
+                }
+            }
+        }
+       
         private void paint_figure(Color name, ref Storage stg, int index)
         {//рисуем круг на панели
             //Pen pen = new Pen(name, 4);
@@ -394,6 +582,7 @@ namespace lab_oop_8
         {
             //проверка на наличие круга на данных координатах
             int c = check_figure(ref storag, k, e.X, e.Y);
+            storag.intit_tree(ref treeView1);
             if (index == k)
                 storag.increase(ref k);
             if (c != -1)
@@ -607,7 +796,7 @@ namespace lab_oop_8
             }
         }
 
-        string path = @"C:\Users\ramze\source\repos\lab_oop_7\lab_oop_7\Test.txt";
+        string path = @"C:\Users\ramze\source\repos\lab_oop_8\lab_oop_8\Test.txt";
         private void button_save_Click(object sender, EventArgs e)
         {
             using (StreamWriter sw = new StreamWriter(path, false, System.Text.Encoding.Default))
