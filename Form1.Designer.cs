@@ -39,6 +39,7 @@
             this.button_load = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.treeView1 = new System.Windows.Forms.TreeView();
+            this.button_sticky = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // paint_box
@@ -50,7 +51,7 @@
             this.paint_box.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.paint_box.Location = new System.Drawing.Point(13, 12);
             this.paint_box.Name = "paint_box";
-            this.paint_box.Size = new System.Drawing.Size(704, 426);
+            this.paint_box.Size = new System.Drawing.Size(701, 426);
             this.paint_box.TabIndex = 2;
             this.paint_box.MouseClick += new System.Windows.Forms.MouseEventHandler(this.paint_box_MouseClick);
             // 
@@ -148,18 +149,30 @@
             // 
             // treeView1
             // 
-            this.treeView1.Location = new System.Drawing.Point(722, 244);
+            this.treeView1.Location = new System.Drawing.Point(722, 273);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(156, 194);
+            this.treeView1.Size = new System.Drawing.Size(156, 165);
             this.treeView1.TabIndex = 16;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.treeView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            // 
+            // button_sticky
+            // 
+            this.button_sticky.Location = new System.Drawing.Point(722, 244);
+            this.button_sticky.Name = "button_sticky";
+            this.button_sticky.Size = new System.Drawing.Size(102, 23);
+            this.button_sticky.TabIndex = 17;
+            this.button_sticky.Text = "Липкий";
+            this.button_sticky.UseVisualStyleBackColor = true;
+            this.button_sticky.Click += new System.EventHandler(this.button_sticky_Click);
+            this.button_sticky.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(890, 450);
+            this.ClientSize = new System.Drawing.Size(887, 450);
+            this.Controls.Add(this.button_sticky);
             this.Controls.Add(this.treeView1);
             this.Controls.Add(this.button_load);
             this.Controls.Add(this.button_save);
@@ -189,6 +202,7 @@
         private System.Windows.Forms.Button button_load;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.Button button_sticky;
     }
 }
 
