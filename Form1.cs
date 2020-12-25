@@ -39,6 +39,7 @@ namespace lab_oop_8
         public class Figure
         {
             public int x, y, rad, lenght, size;
+            //public int min_x = 99999, max_x = 0, min_y = 99999, max_y = 0;
             public Color color = Color.Navy;
             public Color fillcolor;
             public bool is_sticky = false;
@@ -69,7 +70,7 @@ namespace lab_oop_8
             public int maxcount = 10;
             public Figure[] group;
             public int count;
-            int min_x = 99999, max_x = 0, min_y = 99999, max_y = 0;
+            public int min_x = 99999, max_x = 0, min_y = 99999, max_y = 0;
             public Group()
             {   // Выделяем maxcount мест в хранилище
                 count = 0;
@@ -103,6 +104,7 @@ namespace lab_oop_8
             public override void UnGroup(ref Storage stg, int c)
             {
                 stg.delete_object(c);
+                stg.sorting(k);
                 for (int i = 0; i < count; ++i)
                 {
                     stg.add_object(index, ref group[i], k, ref indexin);
@@ -115,8 +117,6 @@ namespace lab_oop_8
                     group[i].paint_figure(pen, paint_box);
                 }
             }
-
-
 
             public void getsize()
             {
@@ -139,14 +139,8 @@ namespace lab_oop_8
                 }
             }
 
-
-
             public override void move_x(int x, Panel paint_box)
             {
-                //for (int i = 0; i < count; ++i)
-                //{
-                //    group[i].move_x(x, paint_box);
-                //}
                 getsize();
                 if ((min_x + x) > 0 && (max_x + x) < paint_box.ClientSize.Width)
                 {
@@ -156,9 +150,6 @@ namespace lab_oop_8
                     }
                 }
             }
-
-
-
             public override void get_min_x(ref int f)
             {
                 f = min_x;
@@ -180,10 +171,6 @@ namespace lab_oop_8
 
             public override void move_y(int y, Panel paint_box)
             {
-                //for (int i = 0; i < count; ++i)
-                //{
-                //    group[i].move_y(y, paint_box);
-                //}
                 getsize();
                 if ((min_y + y) > 0 && (max_y + y) < paint_box.ClientSize.Height)
                 {
@@ -222,6 +209,14 @@ namespace lab_oop_8
             public override string name()
             {
                 return "Group";
+            }
+            public override void setcolored(Color color)
+            {
+                for (int i = 0; i < count; ++i)
+                {
+                    group[i].color = color;
+                }
+                this.color = color;
             }
         }
         public class CreateFigure : Figure
@@ -287,15 +282,13 @@ namespace lab_oop_8
                             return true;
                         break;
                     case "Group":
-                        for (int v = 0; v < (stg.objects[j] as Group).count; ++v)
-                        {
-                            string l = (stg.objects[j] as Group).name();
-                            if (FigureCheck(stg, i, v, l, 1))
-                                return true;
-                        }
+                        (stg.objects[j] as Group).getsize();
+                        if (stg.objects[i].x <= (stg.objects[j] as Group).max_x && (stg.objects[i].x + (stg.objects[i].rad * 2)) >=
+                            (stg.objects[j] as Group).min_x &&
+                                stg.objects[i].y <= (stg.objects[j] as Group).max_y &&
+                                (stg.objects[i].y + (stg.objects[i].rad * 2)) >= (stg.objects[j] as Group).min_y)
+                            return true;
                         break;
-                    case null:
-                        return false;
                 }
                 return false;
 
@@ -693,6 +686,7 @@ namespace lab_oop_8
                     if (stg.objects[i].color == Color.Red)
                     {
                         stg.delete_object(i);
+                        stg.sorting(k);
                     }
                 }
             }
