@@ -452,6 +452,7 @@ namespace lab_oop_8
                 }
                 objects[ind] = object1;
                 indexin = ind;
+                sorting(k);
                 NotifyObservers();
             }
             public void delete_object(int ind)
@@ -504,7 +505,22 @@ namespace lab_oop_8
                 foreach (IObserver observer in observers)
                     observer.Update(ref treeView, this);
             }
-
+            public void sorting (int size)
+            {
+                Storage storage1 = new Storage(size);
+                int col = 0;
+                for (int i = 0; i < size; ++i)
+                {
+                    if (!check_empty(i))
+                    {
+                        storage1.objects[col] = objects[i];
+                        ++col;
+                    }
+                }
+                initialisat(size);
+                for (int i = 0; i < size; ++i)
+                    objects[i] = storage1.objects[i];
+            }
             //~Storage() { }
         };
 
@@ -524,6 +540,11 @@ namespace lab_oop_8
                     }
                 }
                 treeView.ExpandAll();
+            }
+            public void treeSelect(ref TreeView treeView, int index) //выбор узла
+            {
+                treeView.SelectedNode = treeView.Nodes[0].Nodes[index];
+                treeView.Focus();
             }
             public void fillnode(TreeNode treeNode, Figure figure)
             {
@@ -601,6 +622,7 @@ namespace lab_oop_8
                     remove_selection_circle(ref storag);
 
                     paint_figure(Color.Red, ref storag, c);
+                    tree.treeSelect(ref treeView1, c);
                 }
                 return;
             }
@@ -655,7 +677,6 @@ namespace lab_oop_8
                 }
             }
         }
-
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {//кнопка Delete
@@ -831,6 +852,20 @@ namespace lab_oop_8
                 paint_all(ref storag);
                 sr.Close();
             }
+        }
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            remove_selection_circle(ref storag);
+            int g;
+            if (e.Node.Level != 1)
+            {
+                g = e.Node.Parent.Index;
+            }
+            else
+            {
+                g = e.Node.Index;
+            }
+            paint_figure(Color.Red, ref storag, g);
         }
     }
 }
